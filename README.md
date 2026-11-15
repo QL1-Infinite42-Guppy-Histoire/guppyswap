@@ -1,4 +1,4 @@
-# QL1Swap
+# GuppySwap
 
 A swap site for QL1, part of **Guppy's Guide**. Live since 2026-11-14.
 

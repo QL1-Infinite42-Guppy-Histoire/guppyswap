@@ -2,7 +2,7 @@
 
 A swap site for QL1, part of **Guppy's Guide**. Live since 2026-11-14.
 
-- 🌐 Site: https://ql1-infinite42-guppy-histoire.github.io/ql1swap/
+- 🌐 Site: https://ql1-infinite42-guppy-histoire.github.io/guppyswap/
 - 🧭 Dashboard: https://ql1-infinite42-guppy-histoire.github.io/guppys-guide-dashboard/
 
 ## What it does

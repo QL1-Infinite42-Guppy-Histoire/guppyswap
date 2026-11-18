@@ -48,7 +48,15 @@
   .grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 28px; align-items: start; }
   @media (min-width: 1024px) { .grid { grid-template-columns: 5fr 4fr; } }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
-  .card.swapcard { border-radius: 24px; padding: 22px; box-shadow: var(--card-shadow); max-width: 560px; width: 100%; }
+  .card.swapcard { border-radius: 24px; padding: 22px; box-shadow: var(--card-shadow); max-width: 480px; width: 100%; justify-self: center; }
+  .sidecol { display: grid; gap: 14px; align-content: start; grid-template-columns: 1fr; }
+  @media (min-width: 700px) and (max-width: 1023px) { .sidecol { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1024px) {
+    h1 { font-size: 40px; }
+    .lead { font-size: 17px; }
+    .card.swapcard { padding: 24px; }
+    .amt { font-size: 32px; }
+  }
   .card.swapcard h2 { font-size: 17px; margin-bottom: 14px; }
   .card h2 { margin: 0 0 10px; font-size: 18px; }
   .card p { margin: 0 0 8px; color: var(--muted); font-size: 14.5px; }
@@ -191,8 +199,8 @@
       <div class="status" id="statusBox"></div>
     </div>
 
-    <div>
-      <div class="card" style="margin-bottom:14px">
+    <div class="sidecol">
+      <div class="card">
         <h2><span class="en">How it works</span><span class="ja">仕組み</span></h2>
         <p><span class="en">Swaps run on <b>QomSwap</b> (router <span class="addr">0xc1f9…4f30</span>) on QL1 (chain ID 766) through your MetaMask. Approvals are always for the exact swap amount, never unlimited.</span><span class="ja">スワップは QL1（チェーンID 766）の <b>QomSwap</b>（ルーター <span class="addr">0xc1f9…4f30</span>）で、MetaMask から実行します。承認（approve）は毎回スワップする額ちょうどだけにし、無制限の承認はしません。</span></p>
         <p><span class="en">Native QOM swaps go through WQOM inside the same transaction. Picking QOM → WQOM wraps, and WQOM → QOM unwraps — no pool involved.</span><span class="ja">ネイティブ QOM の交換は、同じトランザクションの中で WQOM 経由で行われます。QOM → WQOM はラップ、WQOM → QOM はアンラップで、プールは使いません。</span></p>

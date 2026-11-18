@@ -7,6 +7,9 @@
 <meta name="description" content="GuppySwap: a simple swap site for QL1 (QomSwap). Live quotes read straight from the chain, exact-amount approvals, EN/JP. Part of Guppy's Guide — developed by the community, not an official QL1 service." />
 <meta property="og:title" content="GuppySwap — Swap on QL1 | Guppy's Guide" />
 <meta property="og:description" content="Swap tokens on QL1 via QomSwap. Quotes are live on-chain reads; nothing is estimated or invented." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 <script>
   try {
     if (localStorage.getItem("guppy-theme") === "dark") document.documentElement.dataset.theme = "dark";
@@ -16,17 +19,19 @@
 <style>
   :root {
     --bg: #f7f8fa; --card: #ffffff; --text: #14181f; --muted: #5c6572; --line: #e3e6ec;
-    --input-bg: #ffffff; --chip: #eef1f5; --accent: #2563eb; --accent-ink: #2563eb;
+    --input-bg: #ffffff; --chip: #eef1f5; --accent: #5f5cff; --accent-ink: #4b44e0;
     --green: #1d9e62; --red: #d64545; --shadow: 0 1px 3px rgba(16,24,40,.06);
-    --panel: #f4f6fa; --card-shadow: 0 12px 32px rgba(16,24,40,.08), 0 1px 3px rgba(16,24,40,.06);
+    --panel: #f2f4ff; --card-shadow: 0 18px 44px rgba(64,64,180,.14), 0 2px 6px rgba(16,24,40,.06);
+    --accent-shadow: #3d38b8; --wash: #dfe9ff;
   }
   :root[data-theme="dark"] {
     --bg: #000000; --card: #121316; --text: #f2f3f5; --muted: #9aa1ab; --line: #26282e;
     --input-bg: #0a0a0b; --chip: #1b1d21; --shadow: none;
-    --panel: #1a1b1f; --card-shadow: none;
+    --panel: #1a1b26; --card-shadow: none;
+    --accent: #7d76ff; --accent-ink: #a49dff; --accent-shadow: #4640a3; --wash: #0d0d1a;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; line-height: 1.65; }
+  body { margin: 0; background: linear-gradient(180deg, var(--wash), var(--bg) 340px) fixed, var(--bg); color: var(--text); font-family: "Nunito", "M PLUS Rounded 1c", -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; line-height: 1.65; }
   .ja { display: none; }
   [data-lang="ja"] .ja { display: inline; }
   [data-lang="ja"] .en { display: none; }
@@ -53,8 +58,10 @@
   .addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px; background: var(--chip); border-radius: 8px; padding: 3px 9px; }
   .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); display: inline-block; }
   .dot.on { background: var(--green); }
-  button.primary { background: var(--accent); color: #fff; border: none; border-radius: 16px; padding: 12px 18px; font-size: 16px; font-weight: 700; cursor: pointer; min-height: 48px; }
-  button.primary:disabled { opacity: .45; cursor: not-allowed; }
+  button.primary { background: linear-gradient(135deg, #00c2ff, var(--accent)); color: #fff; border: none; border-radius: 16px; padding: 12px 18px; font-family: inherit; font-size: 16px; font-weight: 800; cursor: pointer; min-height: 48px; box-shadow: 0 4px 0 var(--accent-shadow), 0 10px 22px rgba(80,80,220,.28); transition: transform .05s ease, box-shadow .05s ease, filter .15s ease; }
+  button.primary:hover:not(:disabled) { filter: brightness(1.06); }
+  button.primary:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-shadow), 0 4px 10px rgba(80,80,220,.22); }
+  button.primary:disabled { opacity: .45; cursor: not-allowed; box-shadow: 0 4px 0 var(--accent-shadow); }
   button.wide { width: 100%; margin-top: 14px; }
   button.primary.wide { min-height: 60px; font-size: 18px; font-weight: 800; border-radius: 20px; }
   #connectBtn { border-radius: 999px; }
@@ -64,14 +71,15 @@
   .amt { flex: 1; min-width: 0; font: inherit; font-size: 30px; font-weight: 700; border: none; background: transparent; color: var(--text); outline: none; }
   .amt::placeholder { color: var(--muted); }
   .tokbtn { display: flex; align-items: center; gap: 8px; font: inherit; font-weight: 800; font-size: 16px; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px; padding: 7px 14px 7px 8px; white-space: nowrap; max-width: 52%; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; min-height: 44px; box-shadow: 0 1px 3px rgba(16,24,40,.10); }
-  .tokbtn::before { content: ""; width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; background: radial-gradient(circle at 32% 30%, #7dd3fc, #2563eb 62%, #1d4ed8); }
+  .tokbtn::before { content: ""; width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; background: radial-gradient(circle at 32% 30%, #67e8f9, #00c2ff 45%, #5f5cff); }
   .bal { font-size: 13px; color: var(--muted); margin-top: 6px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
   .chips { display: flex; gap: 6px; }
   .chipbtn { font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px; padding: 6px 12px; min-height: 36px; }
   .chipbtn:hover { color: var(--text); }
   .flip { display: flex; justify-content: center; margin: -13px 0; position: relative; z-index: 3; }
-  .flip button { width: 46px; height: 46px; border-radius: 14px; border: 4px solid var(--card); background: var(--chip); color: var(--text); font-size: 18px; cursor: pointer; }
+  .flip button { width: 46px; height: 46px; border-radius: 14px; border: 4px solid var(--card); background: var(--chip); color: var(--text); font-family: inherit; font-size: 18px; cursor: pointer; box-shadow: 0 3px 0 rgba(16,24,40,.16); transition: transform .05s ease, box-shadow .05s ease; }
   .flip button:hover { background: var(--line); }
+  .flip button:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(16,24,40,.16); }
   .quote { font-size: 14px; color: var(--muted); display: grid; gap: 4px; margin-top: 12px; background: var(--panel); border-radius: 16px; padding: 12px 14px; }
   .quote b { color: var(--text); }
   .slip { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
@@ -91,7 +99,7 @@
   .tokrow { display: flex; justify-content: space-between; gap: 10px; align-items: center; width: 100%; text-align: left; font: inherit; background: transparent; border: none; border-radius: 10px; padding: 11px 10px; min-height: 52px; cursor: pointer; color: var(--text); }
   .tokrow:hover { background: var(--chip); }
   .tokrow .sym { font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 10px; }
-  .tokrow .sym::before { content: ""; width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; background: radial-gradient(circle at 32% 30%, #7dd3fc, #2563eb 62%, #1d4ed8); }
+  .tokrow .sym::before { content: ""; width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; background: radial-gradient(circle at 32% 30%, #67e8f9, #00c2ff 45%, #5f5cff); }
   .tokrow .sub { font-size: 12.5px; color: var(--muted); }
   .tokrow .r { text-align: right; font-size: 13px; color: var(--muted); }
   .x { align-self: flex-end; }

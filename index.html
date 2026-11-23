@@ -694,6 +694,7 @@ if (typeof document !== "undefined") (function () {
     if (mySeq !== quoteSeq) return; /* a newer quote run superseded this one (amount or pair changed) */
     if ($("amtIn").value !== raw) return; /* stale */
     S.quote = q; S.quoteAmt = amt;
+    if (q) q.key = (S.from.address + (S.from.isNative ? "#n" : "")) + ">" + (S.to.address + (S.to.isNative ? "#n" : "")) + "@" + amt.toString(); /* the displayed quote's identity: pair + amount */
     if (!q) { $("amtOut").value = ""; setStatus(T("No route with a live quote for this amount.", "この額でライブ見積もりが取れるルートがありません。"), "err"); updateAction(); return; }
     setStatus("");
     $("amtOut").value = fmtAmount(q.out, S.to.decimals, 10);
@@ -762,7 +763,12 @@ if (typeof document !== "undefined") (function () {
         btn.textContent = T("Swapping…", "スワップ中…");
         var q = await bestQuote(amt, S.from, S.to); /* fresh quote at send time */
         if (!q || q.wrap) throw new Error("route changed");
-        var minOut = q.out * BigInt(Math.round((100 - S.slip) * 100)) / 10000n;
+        /* The DISPLAYED minimum is the enforced minimum (audit fix 2026-11-24, user-approved):
+           execute only against the quote the user actually saw, for exactly this pair + amount. */
+        var curKey = (S.from.address + (S.from.isNative ? "#n" : "")) + ">" + (S.to.address + (S.to.isNative ? "#n" : "")) + "@" + amt.toString();
+        if (!S.quote || S.quote.key !== curKey || S.quote.minOut == null) throw new Error("QUOTE_STALE");
+        if (q.out < S.quote.minOut) throw new Error("PRICE_MOVED"); /* fresh market can no longer meet the displayed minimum: send nothing */
+        var minOut = S.quote.minOut;
         var deadline = BigInt(Math.floor(Date.now() / 1000) + 1200);
         var data, value = "0x0";
         if (S.from.isNative) { data = SEL.swapETHForTokens + encUint(minOut) + encUint(128) + encAddr(S.account) + encUint(deadline) + encUint(q.path.length) + q.path.map(encAddr).join(""); value = "0x" + amt.toString(16); }
@@ -774,7 +780,9 @@ if (typeof document !== "undefined") (function () {
       }
     } catch (e) {
       var m = (e && e.message) || String(e);
-      if (m.indexOf("rejected") >= 0 || (e && e.code === 4001)) setStatus(T("Cancelled in the wallet.", "ウォレットでキャンセルされました。"), "err");
+      if (m === "PRICE_MOVED") setStatus(T("The price moved beyond your slippage after the quote was shown, so nothing was sent. The quote has been refreshed — review it and press Swap again.", "見積もり表示後に価格がスリッページを超えて動いたため、送信しませんでした。見積もりを更新しました。確認して、もう一度「スワップ」を押してください。"), "err");
+      else if (m === "QUOTE_STALE") setStatus(T("The quote has been refreshed — review it and press Swap again.", "見積もりを更新しました。確認して、もう一度「スワップ」を押してください。"), "err");
+      else if (m.indexOf("rejected") >= 0 || (e && e.code === 4001)) setStatus(T("Cancelled in the wallet.", "ウォレットでキャンセルされました。"), "err");
       else if (m === "reverted") setStatus(T("The transaction reverted. The price may have moved beyond your slippage — try again, or widen the slippage.", "トランザクションが失敗しました。価格がスリッページの範囲を超えて動いた可能性があります。再試行するか、スリッページを広げてください。"), "err");
       else setStatus(T("Error: ", "エラー：") + m.slice(0, 140), "err");
     }
@@ -782,6 +790,8 @@ if (typeof document !== "undefined") (function () {
     try { await refreshBalances(); } catch (e) {}
     renderSwapHead(); S.quote = null; $("amtOut").value = ""; $("quoteBox").style.display = "none";
     updateAction();
+    var remainAmt = S.from ? parseAmount($("amtIn").value, S.from.decimals) : null;
+    if (remainAmt && remainAmt > 0n) runQuote(); /* keep a fresh displayed quote after an approve / abort, so the shown minimum is always the enforced one and the flow can continue */
   });
 
   async function connect() {

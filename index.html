@@ -443,7 +443,7 @@ async function loadChain() {
     var sym = decString(mres[i * 2] || ""), dec = mres[i * 2 + 1] ? Number(decUint(mres[i * 2 + 1].slice(2), 0)) : NaN;
     var reg = regByAddr[a];
     if (!sym) sym = reg ? reg.symbol : "";
-    if (!isFinite(dec)) dec = reg ? reg.decimals : 18;
+    if (!isFinite(dec)) { if (reg) dec = reg.decimals; else return; } /* unreadable decimals and no verified registry fallback: skip rather than guess 18 */
     if (!sym) return; /* unreadable symbol: skip rather than guess */
     toks.push({ id: "t" + a, symbol: sym, name: reg && reg.address !== WQOM ? reg.name : sym, address: a, decimals: dec, isNative: false, depth: depth[a] || 0n, reg: reg && a !== lc(WQOM) ? REGISTRY.indexOf(reg) : (a === lc(WQOM) ? 1 : 999) });
   });
@@ -647,12 +647,12 @@ if (typeof document !== "undefined") (function () {
     $("balIn").textContent = bi != null ? fmtAmount(bi, S.from.decimals, 6) + " " + S.from.symbol : "—";
     $("balOut").textContent = bo != null ? fmtAmount(bo, S.to.decimals, 6) + " " + S.to.symbol : "—";
     var gw = $("gasWarn");
-    if (S.account && S.nativeBal != null && S.nativeBal < 3000000n * (10n ** 18n)) gw.style.display = "block"; else gw.style.display = "none";
+    if (S.account && S.nativeBal != null && S.nativeBal < 6000000n * (10n ** 18n)) gw.style.display = "block"; else gw.style.display = "none";
   }
   S.onBalances = renderSwapHead;
 
   /* amount + chips */
-  var quoteTimer = null;
+  var quoteTimer = null, quoteSeq = 0;
   function scheduleQuote() { if (quoteTimer) clearTimeout(quoteTimer); quoteTimer = setTimeout(runQuote, 350); }
   $("amtIn").addEventListener("input", scheduleQuote);
   document.querySelectorAll("[data-pct]").forEach(function (b) {
@@ -674,11 +674,16 @@ if (typeof document !== "undefined") (function () {
     });
   });
   $("slipCustom").addEventListener("input", function () {
+    if (!$("slipCustom").value.trim()) { /* cleared: fall back to the 1% preset so the active slippage is always visible */
+      document.querySelectorAll("[data-slip]").forEach(function (x) { x.classList.toggle("sel", x.dataset.slip === "1"); });
+      S.slip = 1; scheduleQuote(); return;
+    }
     var v = parseFloat($("slipCustom").value);
     if (isFinite(v) && v >= 0 && v <= 50) { document.querySelectorAll("[data-slip]").forEach(function (x) { x.classList.remove("sel"); }); S.slip = v; scheduleQuote(); }
   });
 
   async function runQuote() {
+    var mySeq = ++quoteSeq;
     S.quote = null;
     var raw = $("amtIn").value;
     var amt = S.from ? parseAmount(raw, S.from.decimals) : null;
@@ -686,6 +691,7 @@ if (typeof document !== "undefined") (function () {
     if (!S.ready || !amt || amt <= 0n || !S.from || !S.to) { $("amtOut").value = ""; updateAction(); return; }
     var q = null;
     try { q = await bestQuote(amt, S.from, S.to); } catch (e) { q = null; }
+    if (mySeq !== quoteSeq) return; /* a newer quote run superseded this one (amount or pair changed) */
     if ($("amtIn").value !== raw) return; /* stale */
     S.quote = q; S.quoteAmt = amt;
     if (!q) { $("amtOut").value = ""; setStatus(T("No route with a live quote for this amount.", "この額でライブ見積もりが取れるルートがありません。"), "err"); updateAction(); return; }

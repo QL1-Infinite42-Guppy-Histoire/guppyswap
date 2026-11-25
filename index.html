@@ -7,6 +7,9 @@
 <meta name="description" content="QQL1 DEX: a swap frontend for QL1 that uses QomSwap's liquidity pools and router — it has no pools of its own. Live quotes read straight from the chain, exact-amount approvals, EN/JP. Part of Guppy's Guide — developed by the community, not an official QL1 service." />
 <meta property="og:title" content="QQL1 DEX — Swap on QL1 | Guppy's Guide" />
 <meta property="og:description" content="Swap tokens on QL1 through QomSwap's liquidity pools and router. Quotes are live on-chain reads; nothing is estimated or invented." />
+<link rel="icon" type="image/png" href="favicon.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta property="og:image" content="https://swap.qql1.com/logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet" />
@@ -65,6 +68,7 @@
   .pill { font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; border: 1px solid var(--line-d); background: linear-gradient(180deg, var(--card), var(--panel)); color: var(--text); padding: 8px 16px; min-height: 44px; box-shadow: var(--shadow-chip); clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px); }
   .pill:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line-d); }
   h1 { font-size: 38px; margin: 10px 0 4px; line-height: 1.25; letter-spacing: .02em; font-weight: 700; }
+  h1 .logo { width: 40px; height: 40px; border-radius: 50%; vertical-align: -9px; margin-right: 10px; box-shadow: 0 2px 8px rgba(16,24,40,.22); }
   .status-badge { display: inline-block; background: linear-gradient(180deg, #22c55e, var(--green)); color: #ffffff; padding: 3px 14px; font-size: 13.5px; font-weight: 800; vertical-align: middle; margin-left: 10px; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); }
   .lead { color: var(--muted); font-size: 16px; max-width: 46em; margin: 6px 0 0; }
   .grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 28px; align-items: start; }
@@ -141,6 +145,7 @@
   .x { align-self: flex-end; }
   @media (max-width: 640px) {
     h1 { font-size: 28px; }
+    h1 .logo { width: 33px; height: 33px; vertical-align: -7px; margin-right: 8px; }
     .lead { font-size: 15px; }
     .card { padding: 16px; }
     .card.swapcard { padding: 18px 16px; }
@@ -160,7 +165,7 @@
   <header class="top">
     <div>
       <p class="brand">Guppy's Guide <small>— Don't Panic</small></p>
-      <h1>QQL1 DEX<span class="status-badge"><span class="en">Live</span><span class="ja">公開中</span></span></h1>
+      <h1><img class="logo" src="logo.png" alt="" width="40" height="40" />QQL1 DEX<span class="status-badge"><span class="en">Live</span><span class="ja">公開中</span></span></h1>
       <p class="lead"><span class="en">A swap frontend for QL1 that trades through QomSwap's liquidity pools and router — QQL1 DEX has no pools of its own. The token list is rebuilt from the chain's pools on every load, and every quote is a live read from the router — no estimated or invented prices.</span><span class="ja">QL1 の QomSwap の流動性プールとルーターを使うスワップ用フロントエンドです（独自のプールは持っていません）。トークン一覧は開くたびにチェーンのプールから作り直し、見積もりはすべてルーターへのライブ読みです。推定や創作の価格は出しません。</span></p>
     </div>
     <div class="controls">

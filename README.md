@@ -1,13 +1,13 @@
 # QQL1 DEX
 
-A swap site for QL1, part of **Guppy's Guide**. Live since 2026-11-14.
+A swap frontend for QL1 that uses QomSwap's liquidity pools and router — it has no pools of its own. Part of **Guppy's Guide**. Live since 2026-11-14.
 
 - 🌐 Site: https://swap.qql1.com/
 - 🧭 Dashboard: https://ql1-infinite42-guppy-histoire.github.io/guppys-guide-dashboard/
 
 ## What it does
 
-- Connect MetaMask on QL1 (EVM chain ID 766) and swap tokens on **QomSwap**
+- Connect MetaMask on QL1 (EVM chain ID 766) and swap tokens through **QomSwap**'s pools and router
   (router `0xc1f90231035A52091eBCb7dddaCa3051a5F44f30`, factory `0x475f361993D6FAcBF32fB82B66be0fB40f3d974C`).
 - The token list is rebuilt on every load from the factory's pools: a token is listed when it has a
   live pool whose QOM side holds at least 10,000,000 QOM, or a qUSDT / qUSDC / qDAI pool
@@ -18,7 +18,7 @@ A swap site for QL1, part of **Guppy's Guide**. Live since 2026-11-14.
   reads — nothing is estimated or invented.
 - Native QOM swaps route through WQOM inside the same transaction; QOM ⇄ WQOM is a wrap/unwrap.
 - Approvals are exact-amount only. Slippage is adjustable (0.5 / 1 / 3% or custom).
-- No external dependencies: the page is a single `index.html` with hand-rolled JSON-RPC/ABI code.
+- No external JavaScript dependencies or build step: a single `index.html` with hand-rolled JSON-RPC/ABI code (fonts load from Google Fonts; the logo and icons are local files).
 
 ## Verification
 

@@ -4,9 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>QQL1 DEX — Swap on QL1 | Guppy's Guide</title>
-<meta name="description" content="QQL1 DEX: a simple swap site for QL1 (QomSwap). Live quotes read straight from the chain, exact-amount approvals, EN/JP. Part of Guppy's Guide — developed by the community, not an official QL1 service." />
+<meta name="description" content="QQL1 DEX: a swap frontend for QL1 that uses QomSwap's liquidity pools and router — it has no pools of its own. Live quotes read straight from the chain, exact-amount approvals, EN/JP. Part of Guppy's Guide — developed by the community, not an official QL1 service." />
 <meta property="og:title" content="QQL1 DEX — Swap on QL1 | Guppy's Guide" />
-<meta property="og:description" content="Swap tokens on QL1 via QomSwap. Quotes are live on-chain reads; nothing is estimated or invented." />
+<meta property="og:description" content="Swap tokens on QL1 through QomSwap's liquidity pools and router. Quotes are live on-chain reads; nothing is estimated or invented." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet" />
@@ -159,7 +159,7 @@
     <div>
       <p class="brand">Guppy's Guide <small>— Don't Panic</small></p>
       <h1>QQL1 DEX<span class="status-badge"><span class="en">Live</span><span class="ja">公開中</span></span></h1>
-      <p class="lead"><span class="en">Swap tokens on QL1 through QomSwap. The token list is rebuilt from the chain's pools on every load, and every quote is a live read from the router — no estimated or invented prices.</span><span class="ja">QL1 のトークンを QomSwap で交換するサイトです。トークン一覧は開くたびにチェーンのプールから作り直し、見積もりはすべてルーターへのライブ読みです。推定や創作の価格は出しません。</span></p>
+      <p class="lead"><span class="en">A swap frontend for QL1 that trades through QomSwap's liquidity pools and router — QQL1 DEX has no pools of its own. The token list is rebuilt from the chain's pools on every load, and every quote is a live read from the router — no estimated or invented prices.</span><span class="ja">QL1 の QomSwap の流動性プールとルーターを使うスワップ用フロントエンドです（独自のプールは持っていません）。トークン一覧は開くたびにチェーンのプールから作り直し、見積もりはすべてルーターへのライブ読みです。推定や創作の価格は出しません。</span></p>
     </div>
     <div class="controls">
       <button class="pill" id="langToggle" type="button">日本語</button>
@@ -228,7 +228,7 @@
     <div class="sidecol">
       <div class="card">
         <h2><span class="en">How it works</span><span class="ja">仕組み</span></h2>
-        <p><span class="en">Swaps run on <b>QomSwap</b> (router <span class="addr">0xc1f9…4f30</span>) on QL1 (chain ID 766) through your MetaMask. Approvals are always for the exact swap amount, never unlimited.</span><span class="ja">スワップは QL1（チェーンID 766）の <b>QomSwap</b>（ルーター <span class="addr">0xc1f9…4f30</span>）で、MetaMask から実行します。承認（approve）は毎回スワップする額ちょうどだけにし、無制限の承認はしません。</span></p>
+        <p><span class="en">This page is a frontend: swaps are executed by <b>QomSwap</b>'s router (<span class="addr">0xc1f9…4f30</span>) and pools on QL1 (chain ID 766) through your MetaMask. Approvals are always for the exact swap amount, never unlimited.</span><span class="ja">このページはフロントエンドです。スワップは QL1（チェーンID 766）の <b>QomSwap</b> のルーター（<span class="addr">0xc1f9…4f30</span>）とプールが、MetaMask 経由で実行します。承認（approve）は毎回スワップする額ちょうどだけにし、無制限の承認はしません。</span></p>
         <p><span class="en">Native QOM swaps go through WQOM inside the same transaction. Picking QOM → WQOM wraps, and WQOM → QOM unwraps — no pool involved.</span><span class="ja">ネイティブ QOM の交換は、同じトランザクションの中で WQOM 経由で行われます。QOM → WQOM はラップ、WQOM → QOM はアンラップで、プールは使いません。</span></p>
         <p><span class="en">Quotes compare the direct pool and routes via WQOM / qUSDT / qUSDC / QSWAP / qCAW, all read live with <i>getAmountsOut</i>, and the best one is used.</span><span class="ja">見積もりは、直接プールと WQOM／qUSDT／qUSDC／QSWAP／qCAW 経由のルートをすべてライブで読み比べ（<i>getAmountsOut</i>）、一番良いものを使います。</span></p>
       </div>

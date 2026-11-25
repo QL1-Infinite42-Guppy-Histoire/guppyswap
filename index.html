@@ -810,16 +810,43 @@ if (typeof document !== "undefined") (function () {
     if (remainAmt && remainAmt > 0n) runQuote(); /* keep a fresh displayed quote after an approve / abort, so the shown minimum is always the enforced one and the flow can continue */
   });
 
+  /* The connect button is ALWAYS shown, whether or not a wallet is
+     detected at load. Detection happens at click time: wallet in-app
+     browsers often inject window.ethereum late, so a click first waits
+     briefly for the provider to appear (ethereum#initialized / polling)
+     and only shows guidance when there is truly no wallet. */
+  function waitForWallet(ms) {
+    if (mm()) return Promise.resolve(mm());
+    return new Promise(function (resolve) {
+      var done = false;
+      var finish = function () { if (!done) { done = true; resolve(mm()); } };
+      window.addEventListener("ethereum#initialized", finish, { once: true });
+      var t0 = Date.now();
+      (function poll() {
+        if (done) return;
+        if (mm() || Date.now() - t0 >= ms) return finish();
+        setTimeout(poll, 100);
+      })();
+    });
+  }
+  var watching = false;
+  function watchWallet() { /* attach once a provider exists (it may arrive late) */
+    var e = mm(); if (!e || !e.on || watching) return; watching = true;
+    e.on("accountsChanged", function (accs) { if (disconnecting && (!accs || !accs.length)) return; location.reload(); });
+    e.on("chainChanged", function () { location.reload(); });
+  }
   async function connect() {
-    if (!mm()) { setStatus(T("MetaMask was not found in this browser.", "このブラウザに MetaMask が見つかりません。"), "err"); return; }
+    var provider = await waitForWallet(2000);
+    if (!provider) { setStatus(T("No wallet was found in this browser. Open this page inside MetaMask or another wallet browser, then tap Connect.", "このブラウザにウォレットが見つかりません。MetaMask などのウォレット内ブラウザでこのページを開いてから、接続を押してください。"), "err"); return; }
     try {
-      var accts = await mm().request({ method: "eth_requestAccounts" });
+      var accts = await provider.request({ method: "eth_requestAccounts" });
       S.account = lc(accts[0]);
       await ensureChain();
       $("wDot").classList.add("on");
       $("wState").textContent = T("Connected (QL1)", "接続中（QL1）");
       $("wAddr").style.display = ""; $("wAddr").textContent = short(S.account);
       $("connectBtn").innerHTML = "<span class='en'>Connected: " + short(S.account) + "</span><span class='ja'>接続済み：" + short(S.account) + "</span>";
+      watchWallet();
       await refreshBalances(); renderSwapHead(); updateAction(); runQuote();
     } catch (e) { setStatus(T("Connection failed.", "接続に失敗しました。"), "err"); }
   }
@@ -850,10 +877,7 @@ if (typeof document !== "undefined") (function () {
   $("discBtn").addEventListener("click", disconnect);
   $("discClose").addEventListener("click", function () { $("discModal").classList.remove("open"); });
   $("discModal").addEventListener("click", function (e) { if (e.target === $("discModal")) $("discModal").classList.remove("open"); });
-  if (mm() && mm().on) {
-    mm().on("accountsChanged", function (accs) { if (disconnecting && (!accs || !accs.length)) return; /* our own revoke: local reset already handled it */ location.reload(); });
-    mm().on("chainChanged", function () { location.reload(); });
-  }
+  watchWallet();
 
   /* boot */
   applyLang();

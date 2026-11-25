@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>GuppySwap — Swap on QL1 | Guppy's Guide</title>
-<meta name="description" content="GuppySwap: a simple swap site for QL1 (QomSwap). Live quotes read straight from the chain, exact-amount approvals, EN/JP. Part of Guppy's Guide — developed by the community, not an official QL1 service." />
-<meta property="og:title" content="GuppySwap — Swap on QL1 | Guppy's Guide" />
+<title>QQL1 DEX — Swap on QL1 | Guppy's Guide</title>
+<meta name="description" content="QQL1 DEX: a simple swap site for QL1 (QomSwap). Live quotes read straight from the chain, exact-amount approvals, EN/JP. Part of Guppy's Guide — developed by the community, not an official QL1 service." />
+<meta property="og:title" content="QQL1 DEX — Swap on QL1 | Guppy's Guide" />
 <meta property="og:description" content="Swap tokens on QL1 via QomSwap. Quotes are live on-chain reads; nothing is estimated or invented." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,7 +17,7 @@
   } catch (e) {}
 </script>
 <style>
-  /* GuppySwap — Guppy's Guide UI Canon v2 (Qom DEX design language), accent slot #3 classic blue.
+  /* QQL1 DEX — Guppy's Guide UI Canon v2 (Qom DEX design language), accent slot #3 classic blue.
      Angular clip-path cuts, 3D press-down buttons, steel tokens. Display layer only. */
   :root {
     --bg:#e8edf3; --bg2:#d7dfe9; --card:#f7fafc; --panel:#e2e8f0; --panel2:#cbd5e1;
@@ -158,7 +158,7 @@
   <header class="top">
     <div>
       <p class="brand">Guppy's Guide <small>— Don't Panic</small></p>
-      <h1>GuppySwap<span class="status-badge"><span class="en">Live</span><span class="ja">公開中</span></span></h1>
+      <h1>QQL1 DEX<span class="status-badge"><span class="en">Live</span><span class="ja">公開中</span></span></h1>
       <p class="lead"><span class="en">Swap tokens on QL1 through QomSwap. The token list is rebuilt from the chain's pools on every load, and every quote is a live read from the router — no estimated or invented prices.</span><span class="ja">QL1 のトークンを QomSwap で交換するサイトです。トークン一覧は開くたびにチェーンのプールから作り直し、見積もりはすべてルーターへのライブ読みです。推定や創作の価格は出しません。</span></p>
     </div>
     <div class="controls">
@@ -235,7 +235,7 @@
       <div class="card">
         <h2><span class="en">Which tokens are listed</span><span class="ja">載っているトークン</span></h2>
         <p><span class="en">The list is rebuilt from QomSwap's factory on every load: a token appears when it has a live pool whose QOM side holds at least 10,000,000 QOM, or a qUSDT / qUSDC / qDAI pool. Tokens without a real pool are never listed — for example ZAP has no QomSwap pool on QL1, so it does not appear. If a route quotes zero for your amount, swapping stays disabled.</span><span class="ja">一覧は開くたびに QomSwap のファクトリーから作り直します。プールの QOM 側に 1,000 万 QOM 以上入っているトークン、または qUSDT／qUSDC／qDAI のプールがあるトークンだけを載せます。本物のプールが無いトークンは載せません（例：QL1 の ZAP には QomSwap のプールが無いので、出てきません）。あなたの額で見積もりがゼロになるルートでは、スワップは押せません。</span></p>
-        <p><span class="en">GuppySwap is part of Guppy's Guide, developed by the community. It is not an official QL1 service. This is the first release — please test with a small amount first.</span><span class="ja">GuppySwap は Guppy's Guide の一員で、コミュニティによる開発です。QL1 の公式サービスではありません。公開したばかりの初版なので、最初は少額で試してください。</span></p>
+        <p><span class="en">QQL1 DEX is part of Guppy's Guide, developed by the community. It is not an official QL1 service. This is the first release — please test with a small amount first.</span><span class="ja">QQL1 DEX は Guppy's Guide の一員で、コミュニティによる開発です。QL1 の公式サービスではありません。公開したばかりの初版なので、最初は少額で試してください。</span></p>
         <p style="margin-top:10px"><span id="poolInfo"><span class="en">Reading pools from the chain…</span><span class="ja">プールをチェーンから読んでいます…</span></span></p>
       </div>
     </div>
@@ -258,7 +258,7 @@
 
 <script>
 "use strict";
-/* ================= GuppySwap — QomSwap frontend for QL1 (chain 766) =================
+/* ================= QQL1 DEX — QomSwap frontend for QL1 (chain 766) =================
    Hand-rolled JSON-RPC + ABI (house style, no external dependencies).
    Reads: public RPC. Writes: MetaMask only. Quotes: router.getAmountsOut, live. */
 var RPC_URL = "https://evm-rpc-ql1.mschihuahua.org";
@@ -583,7 +583,7 @@ if (typeof document !== "undefined") (function () {
   function themeLabel() { var d = document.documentElement.dataset.theme === "dark"; themeBtn.textContent = isJa() ? (d ? "☀️ 白背景" : "🌙 黒背景") : (d ? "☀️ Light" : "🌙 Dark"); }
   function applyLang() {
     document.documentElement.lang = isJa() ? "ja" : "en";
-    document.title = isJa() ? "GuppySwap — QL1 のスワップ | Guppy's Guide" : "GuppySwap — Swap on QL1 | Guppy's Guide";
+    document.title = isJa() ? "QQL1 DEX — QL1 のスワップ | Guppy's Guide" : "QQL1 DEX — Swap on QL1 | Guppy's Guide";
     langBtn.textContent = isJa() ? "English" : "日本語";
     themeLabel(); renderSwapHead(); updateAction();
   }

@@ -94,6 +94,8 @@
   button.primary:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: var(--shadow-btn); }
   button.wide { width: 100%; margin-top: 14px; }
   button.primary.wide { min-height: 60px; padding: 16px; font-size: 17px; }
+  #discBtn { background: linear-gradient(180deg, #ef4444, var(--red) 55%, var(--red-d)); border-color: var(--red-d); }
+  #discBtn:active:not(:disabled) { box-shadow: 0 1px 0 var(--red-d), 0 4px 8px rgba(220,38,38,.3), inset 0 1px 0 rgba(255,255,255,.3); }
   .field { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--line-d); box-shadow: var(--inset-panel); padding: 14px; margin-bottom: 6px; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
   .field .row { display: flex; gap: 10px; align-items: center; }
   .field label { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; display: block; margin-bottom: 8px; }
@@ -253,6 +255,15 @@
     <h3><span class="en">Choose a token</span><span class="ja">トークンを選ぶ</span></h3>
     <input class="search" id="tokSearch" placeholder="Search name or 0x address" />
     <div class="toklist" id="tokList"></div>
+  </div>
+</div>
+
+<div class="modal" id="discModal">
+  <div class="sheet" style="max-width:420px">
+    <button class="pill x" id="discClose" type="button">✕</button>
+    <h3><span class="en">Wallet connected</span><span class="ja">ウォレット接続中</span></h3>
+    <p class="addr" id="discAddr" style="word-break:break-all; margin:0 0 14px"></p>
+    <button class="primary wide" id="discBtn" type="button" style="margin-top:0"><span class="en">Disconnect</span><span class="ja">接続を解除</span></button>
   </div>
 </div>
 
@@ -803,13 +814,39 @@ if (typeof document !== "undefined") (function () {
       $("wDot").classList.add("on");
       $("wState").textContent = T("Connected (QL1)", "接続中（QL1）");
       $("wAddr").style.display = ""; $("wAddr").textContent = short(S.account);
-      $("connectBtn").style.display = "none";
+      $("connectBtn").innerHTML = "<span class='en'>Connected: " + short(S.account) + "</span><span class='ja'>接続済み：" + short(S.account) + "</span>";
       await refreshBalances(); renderSwapHead(); updateAction(); runQuote();
     } catch (e) { setStatus(T("Connection failed.", "接続に失敗しました。"), "err"); }
   }
-  $("connectBtn").addEventListener("click", connect);
+  /* Disconnect flow, same spec as the QOM DEX (qomdex.com): tapping the
+     connect button while connected opens a small dialog with the full
+     address and a Disconnect button; disconnecting asks the wallet to
+     revoke this site's account permission where supported
+     (wallet_revokePermissions) and always clears the local state, so the
+     button returns to "Connect MetaMask" and nothing silently restores. */
+  var disconnecting = false;
+  $("connectBtn").addEventListener("click", function () {
+    if (S.account) { $("discAddr").textContent = S.account; $("discModal").classList.add("open"); return; }
+    connect();
+  });
+  async function disconnect() {
+    disconnecting = true;
+    try { if (mm()) await mm().request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] }); } catch (e) { /* wallet without revoke support: local disconnect only */ }
+    S.account = null; S.allow = null; S.balances = {}; S.nativeBal = null; S.quote = null;
+    $("discModal").classList.remove("open");
+    $("wDot").classList.remove("on");
+    $("wState").textContent = T("Wallet not connected", "ウォレット未接続");
+    $("wAddr").style.display = "none"; $("wAddr").textContent = "";
+    $("connectBtn").innerHTML = "<span class='en'>Connect MetaMask</span><span class='ja'>MetaMask を接続</span>";
+    $("amtOut").value = ""; $("quoteBox").style.display = "none";
+    renderSwapHead(); updateAction();
+    setStatus(T("Disconnected.", "接続を解除しました。"), "ok");
+  }
+  $("discBtn").addEventListener("click", disconnect);
+  $("discClose").addEventListener("click", function () { $("discModal").classList.remove("open"); });
+  $("discModal").addEventListener("click", function (e) { if (e.target === $("discModal")) $("discModal").classList.remove("open"); });
   if (mm() && mm().on) {
-    mm().on("accountsChanged", function () { location.reload(); });
+    mm().on("accountsChanged", function (accs) { if (disconnecting && (!accs || !accs.length)) return; /* our own revoke: local reset already handled it */ location.reload(); });
     mm().on("chainChanged", function () { location.reload(); });
   }
 
